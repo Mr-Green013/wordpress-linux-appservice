@@ -1,0 +1,14 @@
+# วางเป็น wp-content/uploads/.htaccess
+# uploads เป็นโฟลเดอร์ที่เขียนได้ — ถ้ามีช่องโหว่อัปโหลดไฟล์ web shell จะถูกวางที่นี่
+# กฎนี้ทำให้ไฟล์ PHP ในนี้ถูกปฏิเสธแทนที่จะถูกรัน
+
+Options -Indexes -ExecCGI
+
+<FilesMatch "\.(?i:php\d?|phtml|phar|pht|phps|cgi|pl|py|sh|asp|aspx|jsp)$">
+    Require all denied
+</FilesMatch>
+
+# กันไฟล์ซ่อน .user.ini ที่อาจใช้เปลี่ยน auto_prepend_file
+<FilesMatch "^\.">
+    Require all denied
+</FilesMatch>

@@ -1,0 +1,70 @@
+# ---------------------------------------------------------------------------
+# Security rules สำหรับ public_html/.htaccess
+# วางไว้ "เหนือ" บล็อก "# BEGIN WordPress" — ห้ามวางในบล็อกนั้น (WordPress จะเขียนทับ)
+# รองรับ Apache 2.4 (GoDaddy cPanel) และ LiteSpeed (Hostinger)
+# ---------------------------------------------------------------------------
+
+# ห้ามแสดงรายการไฟล์ในโฟลเดอร์
+Options -Indexes
+
+# --- HTTP -> HTTPS (www -> non-www) ----------------------------------------
+# ถ้าต้องการใช้ www เป็นหลัก ให้กลับเงื่อนไขเอง
+<IfModule mod_rewrite.c>
+RewriteEngine On
+RewriteCond %{HTTPS} !=on
+RewriteCond %{HTTP:X-Forwarded-Proto} !=https
+RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
+RewriteCond %{HTTP_HOST} ^www\.(.+)$ [NC]
+RewriteRule ^ https://%1%{REQUEST_URI} [L,R=301]
+
+# กัน user enumeration ผ่าน /?author=N (ยกเว้นใน wp-admin)
+RewriteCond %{REQUEST_URI} !^/wp-admin [NC]
+RewriteCond %{QUERY_STRING} (^|&)author=\d+ [NC]
+RewriteRule ^ - [F,L]
+</IfModule>
+
+# --- ไฟล์อ่อนไหว ----------------------------------------------------------
+<FilesMatch "^(wp-config\.php|\.htaccess|\.user\.ini|php\.ini|readme\.html|license\.txt|wp-config-sample\.php|error_log)$">
+    Require all denied
+</FilesMatch>
+
+# backup / dump / log / ไฟล์แก้ไขค้าง ที่มักหลุดอยู่ใน webroot
+<FilesMatch "\.(bak|backup|old|orig|save|swp|sql|sql\.gz|log|ini|env)$">
+    Require all denied
+</FilesMatch>
+
+# ปิด XML-RPC (brute-force amplification + pingback DDoS)
+# ลบบล็อกนี้ถ้าใช้ Jetpack หรือแอปมือถือ WordPress
+<Files xmlrpc.php>
+    Require all denied
+</Files>
+
+# ห้ามรัน PHP ใน wp-includes โดยตรง
+<IfModule mod_rewrite.c>
+RewriteRule ^wp-admin/includes/ - [F,L]
+RewriteRule !^wp-includes/ - [S=3]
+RewriteRule ^wp-includes/[^/]+\.php$ - [F,L]
+RewriteRule ^wp-includes/js/tinymce/langs/.+\.php - [F,L]
+RewriteRule ^wp-includes/theme-compat/ - [F,L]
+</IfModule>
+
+# --- Security headers -----------------------------------------------------
+<IfModule mod_headers.c>
+    Header always set X-Content-Type-Options "nosniff"
+    Header always set X-Frame-Options "SAMEORIGIN"
+    Header always set Referrer-Policy "strict-origin-when-cross-origin"
+    Header always set Permissions-Policy "camera=(), microphone=(), geolocation=(), payment=()"
+    Header always unset X-Powered-By
+    Header unset X-Powered-By
+
+    # HSTS: เปิดหลังยืนยันว่า HTTPS ใช้ได้ทุก subdomain แล้ว
+    # เริ่มที่ max-age=300 ทดสอบก่อน แล้วค่อยเพิ่มเป็น 31536000
+    Header always set Strict-Transport-Security "max-age=300" env=HTTPS
+
+    # CSP: WordPress + page builder มักพัง ถ้าจะใช้ให้เริ่มแบบ Report-Only
+    # Header always set Content-Security-Policy-Report-Only "default-src 'self'; img-src 'self' data: https:; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; frame-ancestors 'self'"
+</IfModule>
+
+# ---------------------------------------------------------------------------
+# (บล็อก "# BEGIN WordPress" ... "# END WordPress" เดิมอยู่ด้านล่างนี้)
+# ---------------------------------------------------------------------------
