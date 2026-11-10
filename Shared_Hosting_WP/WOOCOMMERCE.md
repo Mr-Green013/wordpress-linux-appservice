@@ -76,6 +76,7 @@
 เลือก gateway ที่มีปลั๊กอิน WooCommerce ทางการ และรองรับ **PromptPay QR + บัตร + mobile banking**
 ตัวอย่างที่นิยม (ตรวจค่าธรรมเนียมล่าสุดกับผู้ให้บริการ):
 
+- **Stripe** — ดูคู่มือแยก [STRIPE.md](./STRIPE.md) (บัตร, Apple/Google Pay; PromptPay ตรวจว่าปลั๊กอินรองรับหรือยัง)
 - **Opn Payments (เดิม Omise)** — ปลั๊กอิน WooCommerce ทางการ, บัตร/PromptPay/TrueMoney/mobile banking
 - **2C2P** — รองรับหลายช่องทาง/หลายประเทศ
 - **GB Prime Pay** — ผู้ให้บริการไทย, มี PromptPay QR
