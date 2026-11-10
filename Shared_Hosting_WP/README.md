@@ -6,6 +6,7 @@
 ```
 Shared_Hosting_WP/
 ├── README.md                              # คู่มือนี้
+├── WOOCOMMERCE.md                         # ทำร้านค้าออนไลน์ต่อ (payment ไทย, ขนส่ง, PDPA)
 ├── wp-config-hardening.php                # ค่าที่ต้องเพิ่มใน wp-config.php
 ├── htaccess-root.example                  # security rules สำหรับ /public_html/.htaccess
 ├── htaccess-uploads.example               # กันรัน PHP ใน wp-content/uploads
